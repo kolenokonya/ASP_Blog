@@ -1,0 +1,74 @@
+﻿@model ASP_Blog.ViewModels.Home.IndexViewModel
+
+<center>
+    <h2>Главная страница</h2>
+    @if (User.Identity.IsAuthenticated)
+    {
+    @Html.ActionLink("Добавить новость", "AddNews", "Admin")
+    }
+
+    <br /><br />
+</center>
+
+@foreach (var news in Model.News)
+{
+    int commentsCount = 0;
+    <table border="1" width="100%">
+        <tr>
+            <td width="80%">@news.NewsTitle</td>
+            <td width="20%">@news.NewsDate.ToShortDateString()</td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <span style="white-space: pre-line">@news.NewsBody</span><br />
+                <center>
+                    @foreach (var image in Model.Images)
+                    {
+                        if (image.TargetId == news.Id)
+                        {
+                            <a href="@Url.Content(image.ImagePathNormal)"><img src="@Url.Content(image.ImagePathScaled)" /></a>
+                        }
+                    }
+                </center>
+            </td>
+        </tr>
+        <tr>
+            <td align="left">
+                @Html.ActionLink("Комментарии", "ViewComments", "Home", new { newsId = news.Id })
+                @foreach (var newsId in ViewBag.Comments)
+                {
+                    if (newsId == news.Id)
+                    {
+                        commentsCount++;
+                    }
+                }
+                (@commentsCount)
+            </td>
+            <td align="right">
+                @if (User.IsInRole("admin") || User.Identity.Name==news.UserName)
+                {
+                    @Html.ActionLink("Удалить запись", "DeleteNews", "Admin", new { newsId = news.Id })
+                }
+                @news.UserName
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+}
+
+<center>
+    @for (int i = 1; i <= Model.TotalPages; i++)
+    {
+        if (i != Model.CurrentPage)
+        {
+            @Html.ActionLink(i.ToString(), "Index", new { pageNumber = i })
+            <span>&nbsp;</span>
+        }
+        else
+        {
+            @i
+            <span>&nbsp;</span>
+        }
+    }
+</center>

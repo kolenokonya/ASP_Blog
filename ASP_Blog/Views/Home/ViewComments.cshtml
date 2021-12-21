@@ -1,0 +1,60 @@
+﻿@model ASP_Blog.ViewModels.Home.ViewCommentsViewModel
+
+<span style="white-space: pre-line">@Model.News.NewsBody</span>
+
+<br /><br />
+
+<center>
+@if (User.Identity.IsAuthenticated)
+{
+    @Html.ActionLink("Комментировать", "AddComment", "Home", new { newsId = Model.News.Id })
+}
+else
+{
+    <b>Только зарегистрированные пользователи могут оставлять комментарии.</b>
+}
+</center>
+
+<br /><br />
+
+<table width="100%" border="1" valign="top">
+        
+        @foreach (var comment in Model.Comments)
+        {
+    <tr>
+        <td width="20%">
+            @comment.UserName
+            <br />
+            @comment.CommentDate
+        </td>
+        <td>
+            <span style="white-space: pre-line">@comment.CommentBody</span>
+        </td>
+        <td>
+            @if (User.IsInRole("admin") || User.Identity.Name == comment.UserName)
+            {
+               @Html.ActionLink("Удалить комментарий пользователя ", "DeleteComment", "Admin", new { commentId = comment.Id });
+            }
+            @comment.UserName
+        </td>
+    </tr>
+        }
+    
+</table>
+
+<center>
+    @for (int i = 1; i <= Model.TotalPages; i++)
+    {
+        if (i != Model.CurrentPage)
+        {
+            @Html.ActionLink(i.ToString(), "ViewComments", new { newsId = Model.News.Id, pageNumber = i })
+            <span>&nbsp;</span>
+        }
+        else
+        {
+            @i
+            <span>&nbsp;</span>
+        }
+    }
+</center>
+
